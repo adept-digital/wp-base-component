@@ -1,8 +1,8 @@
 <?php
 
-namespace AdeptDigital\WpBaseComponents\Tests\Unit\Component;
+namespace AdeptDigital\WpBaseComponent\Tests\Unit;
 
-use AdeptDigital\WpBaseComponents\Component\AbstractComponent;
+use AdeptDigital\WpBaseComponent\AbstractComponent;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 

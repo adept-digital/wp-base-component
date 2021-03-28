@@ -24,15 +24,23 @@ interface ComponentInterface
     public function getId(): string;
 
     /**
-     * Get a unique namespace for the component.
+     * Get the unique namespace for the component.
      *
-     * Can be used as a prefix for actions, filters, options, transients,
-     * assets, etc.
+     * Used as a prefix for actions/filters, options, transients, assets, etc.
      *
-     * @param string|null $name
      * @return string
      */
-    public function getNamespace(string $name = null): string;
+    public function getBaseNamespace(): string;
+
+    /**
+     * Get a unique namespace for the component.
+     *
+     * Used as a prefix for actions/filters, options, transients, assets, etc.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function getNamespace(string $name): string;
 
     /**
      * Get path to file containing the component meta data.

@@ -2,7 +2,7 @@
 
 namespace AdeptDigital\WpBaseComponent;
 
-use RuntimeException;
+use AdeptDigital\WpBaseComponent\Exception\NotFoundException;
 
 /**
  * Base class for themes and plugins
@@ -59,13 +59,17 @@ abstract class AbstractComponent implements ComponentInterface
     /**
      * @inheritDoc
      */
-    public function getNamespace(string $name = null): string
+    public function getBaseNamespace(): string
     {
-        if ($name === null || $name === '') {
-            return $this->namespace;
-        }
+        return $this->namespace;
+    }
 
-        return "{$this->namespace}_{$name}";
+    /**
+     * @inheritDoc
+     */
+    public function getNamespace(string $name): string
+    {
+        return "{$this->getBaseNamespace()}_{$name}";
     }
 
     /**
@@ -82,7 +86,7 @@ abstract class AbstractComponent implements ComponentInterface
     public function getPath(string $path): string
     {
         if (!file_exists("{$this->getBasePath()}/{$path}")) {
-            throw new RuntimeException("Path not found: {$path}");
+            throw new NotFoundException($path);
         }
 
         return "{$this->getBasePath()}/{$path}";
@@ -94,7 +98,7 @@ abstract class AbstractComponent implements ComponentInterface
     public function getUri(string $path): string
     {
         if (!file_exists("{$this->getBasePath()}/{$path}")) {
-            throw new RuntimeException("Path not found: {$path}");
+            throw new NotFoundException($path);
         }
 
         return "{$this->getBaseUri()}/{$path}";
