@@ -3,57 +3,106 @@
 namespace AdeptDigital\WpBaseComponent\Tests\Unit;
 
 use AdeptDigital\WpBaseComponent\AbstractComponent;
+use AdeptDigital\WpBaseComponent\Exception\NotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class AbstractComponentTest extends TestCase
 {
-    private function getMockComponent(): AbstractComponent
+    /**
+     * @param string $namespace
+     * @param string $file
+     * @return AbstractComponent|MockObject
+     */
+    private function createMockComponent(string $namespace = 'abc', string $file = 'test.php'): MockObject
     {
-        $ns = 'ns';
-        $map = [
-            TEST_DATA_DIR . '/test-theme-child' => 'https://localhost/theme-child',
-            TEST_DATA_DIR . '/test-theme' => 'https://localhost/theme',
-        ];
-
-        return $this->getMockForAbstractClass(
-            AbstractComponent::class,
-            [$ns, $map]
-        );
+        return $this->getMockBuilder(AbstractComponent::class)
+            ->setConstructorArgs([$namespace, $file])
+            ->getMockForAbstractClass();
     }
 
-    public function testGetUriNotFound()
+    private function createMockCallable(): MockObject
     {
-        $this->expectException(RuntimeException::class);
-        $this->getMockComponent()->getUri('not-found.php');
+        return $this
+            ->getMockBuilder(\stdclass::class)
+            ->addMethods(['__invoke'])
+            ->getMock();
     }
 
-    public function testGetPathNotFound()
+    public function testGetBaseNamespace()
     {
-        $this->expectException(RuntimeException::class);
-        $this->getMockComponent()->getPath('not-found.php');
+        $component = $this->createMockComponent();
+        $this->assertEquals('abc', $component->getBaseNamespace());
+
+        $component = $this->createMockComponent('');
+        $this->assertEquals('', $component->getBaseNamespace());
     }
 
     public function testGetNamespace()
     {
-        $component = $this->getMockComponent();
-        $this->assertEquals('ns', $component->getNamespace());
-        $this->assertEquals('ns_test', $component->getNamespace('test'));
+        $component = $this->createMockComponent();
+        $this->assertEquals('abc_def', $component->getNamespace('def'));
+
+        $component = $this->createMockComponent('');
+        $this->assertEquals('_def', $component->getNamespace('def'));
     }
 
-    public function testGetUri()
+    public function testGetFile()
     {
-        $component = $this->getMockComponent();
-        $this->assertEquals('https://localhost/theme-child', $component->getUri());
-        $this->assertEquals('https://localhost/theme-child/style.css', $component->getUri('style.css'));
-        $this->assertEquals('https://localhost/theme/index.php', $component->getUri('index.php'));
+        $component = $this->createMockComponent();
+        $this->assertEquals('test.php', $component->getFile());
+
+        $component = $this->createMockComponent('abc', '');
+        $this->assertEquals('', $component->getFile());
     }
 
     public function testGetPath()
     {
-        $component = $this->getMockComponent();
-        $this->assertEquals(TEST_DATA_DIR . '/test-theme-child', $component->getPath());
-        $this->assertEquals(TEST_DATA_DIR . '/test-theme-child/style.css', $component->getPath('style.css'));
-        $this->assertEquals(TEST_DATA_DIR . '/test-theme/index.php', $component->getPath('index.php'));
+        $component = $this->createMockComponent();
+        $component->method('getBasePath')->willReturn(__DIR__);
+        $this->assertEquals(__FILE__, $component->getPath(basename(__FILE__)));
+
+        $this->expectException(NotFoundException::class);
+        $component->getPath('not-found.txt');
+    }
+
+    public function testGetUri()
+    {
+        $component = $this->createMockComponent();
+        $component->method('getBasePath')->willReturn(__DIR__);
+        $component->method('getBaseUri')->willReturn('http://localhost');
+        $basename = basename(__FILE__);
+        $this->assertEquals("http://localhost/{$basename}", $component->getUri($basename));
+
+        $this->expectException(NotFoundException::class);
+        $component->getPath('not-found.txt');
+    }
+
+    public function testBoot()
+    {
+        $component = $this->createMockComponent();
+
+        $boot = $this->createMockCallable();
+        $boot->expects(self::once())
+            ->method('__invoke')
+            ->with($this->identicalTo($component));
+
+        add_action('abc_boot', $boot);
+        $this->assertFalse(has_action('init', [$component, 'init']));
+        $component->boot();
+        $this->assertNotFalse(has_action('init', [$component, 'init']));
+    }
+
+    public function testInit()
+    {
+        $component = $this->createMockComponent();
+
+        $init = $this->createMockCallable();
+        $init->expects(self::once())
+            ->method('__invoke')
+            ->with($this->identicalTo($component));
+
+        add_action('abc_init', $init);
+        $component->init();
     }
 }
