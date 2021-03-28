@@ -1,0 +1,37 @@
+{
+    "name": "adept-digital/wp-base-component",
+    "description": "",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "authors": [
+        {
+            "name": "Adept Digital",
+            "email": "hello@adeptdigital.com.au"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "AdeptDigital\\WpBaseComponent\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AdeptDigital\\WpBaseComponent\\Tests\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://adept-digital.repo.repman.io"
+        }
+    ],
+    "require-dev": {
+        "wp-cli/wp-cli-bundle": "^2.4",
+        "phpunit/phpunit": "^9.5"
+    }
+}
