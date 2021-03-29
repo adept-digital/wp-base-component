@@ -2,10 +2,11 @@
 
 namespace AdeptDigital\WpBaseComponent\Exception;
 
+use Throwable;
+
 /**
  * Component Exception Interface
  */
-interface ComponentExceptionInterface
+interface ComponentExceptionInterface extends Throwable
 {
-
 }
