@@ -71,8 +71,13 @@ class AbstractComponentTest extends TestCase
         $component = $this->createMockComponent();
         $component->method('getBasePath')->willReturn(__DIR__);
         $component->method('getBaseUri')->willReturn('http://localhost');
+
         $basename = basename(__FILE__);
         $this->assertEquals("http://localhost/{$basename}", $component->getUri($basename));
+        $this->assertEquals("http://localhost/{$basename}", $component->getUri("/{$basename}"));
+        $this->assertEquals("http://localhost/{$basename}", $component->getUri("\\{$basename}"));
+        $this->assertEquals("http://localhost/{$basename}?test=1", $component->getUri("/{$basename}?test=1"));
+        $this->assertEquals("http://localhost/{$basename}?test=1#link", $component->getUri("/{$basename}?test=1#link"));
 
         $this->expectException(NotFoundException::class);
         $component->getPath('not-found.txt');

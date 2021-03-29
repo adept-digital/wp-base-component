@@ -85,11 +85,12 @@ abstract class AbstractComponent implements ComponentInterface
      */
     public function getPath(string $path): string
     {
-        if (!file_exists("{$this->getBasePath()}/{$path}")) {
+        $path = $this->normalisePath($path);
+        if (!file_exists("{$this->getBasePath()}{$path}")) {
             throw new NotFoundException($path);
         }
 
-        return "{$this->getBasePath()}/{$path}";
+        return "{$this->getBasePath()}{$path}";
     }
 
     /**
@@ -97,10 +98,31 @@ abstract class AbstractComponent implements ComponentInterface
      */
     public function getUri(string $path): string
     {
-        if (!file_exists("{$this->getBasePath()}/{$path}")) {
+        $path = $this->normalisePath($path);
+        $pathOnly = parse_url($path, PHP_URL_PATH);
+        if ($pathOnly === false || $pathOnly === null) {
             throw new NotFoundException($path);
         }
 
-        return "{$this->getBaseUri()}/{$path}";
+        if (!file_exists("{$this->getBasePath()}{$pathOnly}")) {
+            throw new NotFoundException($path);
+        }
+
+        return "{$this->getBaseUri()}{$path}";
+    }
+
+    /**
+     * Ensure path uses forward slashes and starts with a slash.
+     *
+     * @param string $path
+     * @return string
+     */
+    private function normalisePath(string $path): string
+    {
+        $path = str_replace('\\', '/', $path);
+        $path = "/{$path}";
+        $path = preg_replace('#/+#', '/', $path);
+
+        return $path;
     }
 }
