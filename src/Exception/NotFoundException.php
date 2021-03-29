@@ -7,7 +7,7 @@ use RuntimeException;
 /**
  * Not Found Exception
  */
-class NotFoundException extends RuntimeException
+class NotFoundException extends RuntimeException implements ComponentExceptionInterface
 {
     /**
      * Missing path.
