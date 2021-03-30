@@ -59,6 +59,7 @@ interface ComponentInterface
      *
      * @param string $path
      * @return string
+     * @throws Exception\NotFoundException
      */
     public function getPath(string $path): string;
 
@@ -74,6 +75,7 @@ interface ComponentInterface
      *
      * @param string $path
      * @return string
+     * @throws Exception\NotFoundException
      */
     public function getUri(string $path): string;
 
