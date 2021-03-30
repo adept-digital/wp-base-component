@@ -29,6 +29,41 @@ class AbstractComponentTest extends TestCase
             ->getMock();
     }
 
+    public function testInvoke()
+    {
+        $component = $this->createMockComponent();
+        $component->method('getBootAction')->willReturn('boot');
+        $component();
+        $this->assertIsInt(has_action('boot', [$component, 'doBoot']));
+        $this->assertIsInt(has_action('init', [$component, 'doInit']));
+        $this->assertIsInt(has_action('abc_boot', [$component, 'boot']));
+        $this->assertIsInt(has_action('abc_init', [$component, 'init']));
+    }
+
+    public function testDoBoot()
+    {
+        $component = $this->createMockComponent();
+        $callable = $this->createMockCallable();
+        $callable->expects(self::once())
+            ->method('__invoke')
+            ->with(self::identicalTo($component));
+
+        add_action('abc_boot', $callable);
+        $component->doBoot();
+    }
+
+    public function testDoInit()
+    {
+        $component = $this->createMockComponent();
+        $callable = $this->createMockCallable();
+        $callable->expects(self::once())
+            ->method('__invoke')
+            ->with(self::identicalTo($component));
+
+        add_action('abc_init', $callable);
+        $component->doInit();
+    }
+
     public function testGetBaseNamespace()
     {
         $component = $this->createMockComponent();
@@ -81,33 +116,5 @@ class AbstractComponentTest extends TestCase
 
         $this->expectException(NotFoundException::class);
         $component->getPath('not-found.txt');
-    }
-
-    public function testBoot()
-    {
-        $component = $this->createMockComponent();
-
-        $boot = $this->createMockCallable();
-        $boot->expects(self::once())
-            ->method('__invoke')
-            ->with($this->identicalTo($component));
-
-        add_action('abc_boot', $boot);
-        $this->assertFalse(has_action('init', [$component, 'init']));
-        $component->boot();
-        $this->assertNotFalse(has_action('init', [$component, 'init']));
-    }
-
-    public function testInit()
-    {
-        $component = $this->createMockComponent();
-
-        $init = $this->createMockCallable();
-        $init->expects(self::once())
-            ->method('__invoke')
-            ->with($this->identicalTo($component));
-
-        add_action('abc_init', $init);
-        $component->init();
     }
 }

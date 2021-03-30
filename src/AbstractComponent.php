@@ -38,20 +38,87 @@ abstract class AbstractComponent implements ComponentInterface
     /**
      * @inheritDoc
      */
-    public function boot(): void
+    public function __invoke(): void
     {
-        do_action($this->getNamespace('boot'), $this);
-        add_action('init', [$this, 'init']);
+        add_action($this->getNamespace('boot'), [$this, 'boot']);
+        add_action($this->getNamespace('init'), [$this, 'init']);
+        add_action($this->getBootAction(), [$this, 'doBoot'], $this->getBootPriority());
+        add_action($this->getInitAction(), [$this, 'doInit'], $this->getInitPriority());
     }
 
     /**
-     * Called on 'init' action and triggers namespaced init action.
-     *
-     * `$this` is passed to action to allow hooking into this component.
+     * Called on namespaced 'boot' action.
      *
      * @return void
      */
-    public function init(): void
+    abstract public function boot(): void;
+
+    /**
+     * Called on namespaced 'init' action.
+     *
+     * @return void
+     */
+    abstract public function init(): void;
+
+    /**
+     * Get the action used to trigger namespaced boot.
+     *
+     * @return string
+     */
+    abstract protected function getBootAction(): string;
+
+    /**
+     * Get the priority for the boot action.
+     *
+     * @return int
+     */
+    protected function getBootPriority(): int
+    {
+        return 10;
+    }
+
+    /**
+     * Get the action used to trigger namespaced init.
+     *
+     * @return string
+     */
+    protected function getInitAction(): string
+    {
+        return 'init';
+    }
+
+    /**
+     * Get the priority for the init action.
+     *
+     * @return int
+     */
+    protected function getInitPriority(): int
+    {
+        return 10;
+    }
+
+    /**
+     * Triggers namespaced boot action.
+     *
+     * Passes `$this` as the first parameter to allow hooking into the
+     * component.
+     *
+     * @return void
+     */
+    public function doBoot(): void
+    {
+        do_action($this->getNamespace('boot'), $this);
+    }
+
+    /**
+     * Triggers namespaced init action.
+     *
+     * Passes `$this` as the first parameter to allow hooking into the
+     * component after it has booted.
+     *
+     * @return void
+     */
+    public function doInit(): void
     {
         do_action($this->getNamespace('init'), $this);
     }

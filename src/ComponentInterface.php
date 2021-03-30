@@ -8,13 +8,11 @@ namespace AdeptDigital\WpBaseComponent;
 interface ComponentInterface
 {
     /**
-     * To be invoked when this object is loaded.
-     *
-     * Compatible with {@see League\Container\ServiceProvider\BootableServiceProviderInterface}
+     * Starts the component.
      *
      * @return void
      */
-    public function boot(): void;
+    public function __invoke(): void;
 
     /**
      * Get WordPress' id for the component
