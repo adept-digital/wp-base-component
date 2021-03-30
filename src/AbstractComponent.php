@@ -40,10 +40,9 @@ abstract class AbstractComponent implements ComponentInterface
      */
     public function __invoke(): void
     {
-        add_action($this->getNamespace('boot'), [$this, 'boot']);
+        $this->boot();
         add_action($this->getNamespace('init'), [$this, 'init']);
-        add_action($this->getBootAction(), [$this, 'doBoot'], $this->getBootPriority());
-        add_action($this->getInitAction(), [$this, 'doInit'], $this->getInitPriority());
+        add_action('init', [$this, 'doInit']);
     }
 
     /**
@@ -59,56 +58,6 @@ abstract class AbstractComponent implements ComponentInterface
      * @return void
      */
     abstract public function init(): void;
-
-    /**
-     * Get the action used to trigger namespaced boot.
-     *
-     * @return string
-     */
-    abstract protected function getBootAction(): string;
-
-    /**
-     * Get the priority for the boot action.
-     *
-     * @return int
-     */
-    protected function getBootPriority(): int
-    {
-        return 10;
-    }
-
-    /**
-     * Get the action used to trigger namespaced init.
-     *
-     * @return string
-     */
-    protected function getInitAction(): string
-    {
-        return 'init';
-    }
-
-    /**
-     * Get the priority for the init action.
-     *
-     * @return int
-     */
-    protected function getInitPriority(): int
-    {
-        return 10;
-    }
-
-    /**
-     * Triggers namespaced boot action.
-     *
-     * Passes `$this` as the first parameter to allow hooking into the
-     * component.
-     *
-     * @return void
-     */
-    public function doBoot(): void
-    {
-        do_action($this->getNamespace('boot'), $this);
-    }
 
     /**
      * Triggers namespaced init action.

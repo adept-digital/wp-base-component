@@ -32,24 +32,9 @@ class AbstractComponentTest extends TestCase
     public function testInvoke()
     {
         $component = $this->createMockComponent();
-        $component->method('getBootAction')->willReturn('boot');
         $component();
-        $this->assertIsInt(has_action('boot', [$component, 'doBoot']));
         $this->assertIsInt(has_action('init', [$component, 'doInit']));
-        $this->assertIsInt(has_action('abc_boot', [$component, 'boot']));
         $this->assertIsInt(has_action('abc_init', [$component, 'init']));
-    }
-
-    public function testDoBoot()
-    {
-        $component = $this->createMockComponent();
-        $callable = $this->createMockCallable();
-        $callable->expects(self::once())
-            ->method('__invoke')
-            ->with(self::identicalTo($component));
-
-        add_action('abc_boot', $callable);
-        $component->doBoot();
     }
 
     public function testDoInit()
