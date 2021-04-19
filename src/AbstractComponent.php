@@ -14,14 +14,14 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @var string
      */
-    private string $namespace;
+    private $namespace;
 
     /**
      * Path to file containing the component meta data.
      *
      * @var string
      */
-    private string $file;
+    private $file;
 
     /**
      * Component constructor.

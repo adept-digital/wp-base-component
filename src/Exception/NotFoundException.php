@@ -14,7 +14,7 @@ class NotFoundException extends RuntimeException implements ComponentExceptionIn
      *
      * @var string
      */
-    private string $path;
+    private $path;
 
     /**
      * Not Found Exception constructor.
